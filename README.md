@@ -8,14 +8,30 @@
 </p>
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" />
-  <img src="https://img.shields.io/badge/Streamlit-1.32-red.svg" />
-  <img src="https://img.shields.io/badge/SHAP-Explainable%20AI-green.svg" />
-  <img src="https://img.shields.io/badge/XGBoost-Model-orange.svg" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  <img src="https://img.shields.io/badge/Last%20Updated-2026--02--25-lightgrey.svg" />
-  <img src="https://img.shields.io/badge/Version-2.0.0-blueviolet.svg" />
+
+  <!-- Python -->
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white" />
+
+  <!-- Streamlit -->
+  <img src="https://img.shields.io/badge/Streamlit-1.32-FF4B4B?logo=streamlit&logoColor=white" />
+
+  <!-- SHAP -->
+  <img src="https://img.shields.io/badge/SHAP-Explainable%20AI-008080?logo=dependabot&logoColor=white" />
+
+  <!-- XGBoost -->
+  <img src="https://img.shields.io/badge/XGBoost-Model-FF9900?logo=apache-spark&logoColor=white" />
+
+  <!-- License -->
+  <img src="https://img.shields.io/badge/License-MIT-yellow?logo=open-source-initiative&logoColor=white" />
+
+  <!-- Last updated -->
+  <img src="https://img.shields.io/badge/Last%20Updated-2026--02--25-lightgrey?logo=github" />
+
+  <!-- Version -->
+  <img src="https://img.shields.io/badge/Version-2.0.0-6f42c1?logo=tag&logoColor=white" />
+
 </p>
+
 
 ---
 
