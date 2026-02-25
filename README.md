@@ -7,6 +7,16 @@
   A transparent, clinically oriented machine‑learning platform for biomarker‑based risk prediction.
 </p>
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" />
+  <img src="https://img.shields.io/badge/Streamlit-1.32-red.svg" />
+  <img src="https://img.shields.io/badge/SHAP-Explainable%20AI-green.svg" />
+  <img src="https://img.shields.io/badge/XGBoost-Model-orange.svg" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  <img src="https://img.shields.io/badge/Last%20Updated-2026--02--25-lightgrey.svg" />
+  <img src="https://img.shields.io/badge/Version-2.0.0-blueviolet.svg" />
+</p>
+
 ---
 
 ##  Overview
