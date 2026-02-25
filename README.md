@@ -9,7 +9,7 @@
 
 ---
 
-## 🌟 Overview
+##  Overview
 
 ClarityPredict is a modular, explainable machine‑learning application built with Streamlit.  
 The platform provides:
@@ -23,7 +23,7 @@ The system is designed for transparency, reproducibility, and clinical relevance
 
 ---
 
-## 🧬 Core Features
+##  Core Features
 
 - **Prediction Engine**  
   Tree‑based regression model with full preprocessing pipeline (imputation + scaling)
@@ -42,7 +42,7 @@ The system is designed for transparency, reproducibility, and clinical relevance
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ClarityPredictV2/
 │
@@ -75,7 +75,7 @@ This structure ensures maintainability, clarity, and scalability.
 
 ---
 
-## 🧠 Machine‑Learning Pipeline
+##  Machine‑Learning Pipeline
 
 ClarityPredict uses a reproducible and transparent ML workflow:
 
@@ -112,7 +112,7 @@ Biomarker dataset with six numerical features:
 
 ---
 
-## 🔍 Explainability (SHAP)
+##  Explainability (SHAP)
 
 ClarityPredict uses **SHAP (SHapley Additive exPlanations)** to provide transparent and clinically meaningful model interpretation.
 
@@ -127,7 +127,7 @@ This ensures every prediction is interpretable and grounded in measurable biomar
 
 ---
 
-## 🧾 Model Card
+##  Model Card
 
 ### **Model Type**
 XGBoost Regressor (tree‑based)
@@ -159,7 +159,7 @@ XGBoost Regressor (tree‑based)
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 From the project root:
 
