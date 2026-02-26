@@ -1,111 +1,101 @@
-#%%
+"""
+ClarityPredict 2.0 – Model Training Script
+------------------------------------------
 
-#%% md
-# # ClarityPredict 2.0 – Model Training Notebook
-# 
-# Denne notebooken inneholder:
-# - Lasting av datasett
-# - EDA (utforskende dataanalyse)
-# - Preprocessing (imputer + scaler)
-# - Trening av tre modeller
-# - Modell-sammenligning (MAE, RMSE, R²)
-# - Lagring av beste modell
-# 
-# Dette er grunnlaget for rapportens tekniske kapittel.
-# 
-#%% md
-# ## 1. Last inn datasettet
-# 
-#%%
-import pandas as pd
-import numpy as np
+This script trains three regression models on the biomarker dataset:
+- Linear Regression
+- Random Forest Regressor
+- XGBoost Regressor
+
+It performs:
+1. Dataset loading
+2. Preprocessing (median imputation + standard scaling)
+3. Train/test split
+4. Model training and evaluation (MAE, RMSE, R²)
+5. Selection of the best model
+6. Saving of model, scaler, and imputer for production use
+
+The output files are stored in: models/
+"""
+
+import logging
 from pathlib import Path
 
-df = pd.read_csv("../data/dataset.csv")
-print("Loaded dataset with shape:", df.shape)
-df.columns = df.columns.str.lower()
-df.head()
-
-#%% md
-# ## 2. EDA – Utforskende dataanalyse
-# 
-# Vi ser på:
-# - statistikk
-# - manglende verdier
-# - korrelasjoner
-# 
-#%%
-print("\nBasic statistics:")
-display(df.describe())
-
-print("\nMissing values:")
-display(df.isna().sum())
-
-print("\nCorrelation matrix:")
-display(df.corr())
-
-#%% md
-# ## 3. Preprocessing
-# 
-# Vi bruker:
-# - Median-imputering
-# - StandardScaler
-# 
-# Dette matcher produksjonskoden i PredictionService.
-# 
-#%%
-from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
+import joblib
+import numpy as np
 import pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from xgboost import XGBRegressor
 
-# Sørg for at df.columns allerede er gjort små:
+
+# ---------------------------------------------------------
+# Logging configuration
+# ---------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------
+# Paths
+# ---------------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parents[1]
+DATA_PATH = BASE_DIR / "data" / "dataset.csv"
+MODELS_DIR = BASE_DIR / "models"
+MODELS_DIR.mkdir(exist_ok=True)
+
+
+# ---------------------------------------------------------
+# Load dataset
+# ---------------------------------------------------------
+logger.info("Loading dataset from %s", DATA_PATH)
+df = pd.read_csv(DATA_PATH)
 df.columns = df.columns.str.lower()
 
 features = ["age", "bmi", "glucose", "insulin", "hdl", "ldl"]
+target = "target"
 
 X = df[features]
-y = df["target"]   # <-- endret fra "Target" til "target"
+y = df[target]
+
+logger.info("Dataset loaded with shape: %s", df.shape)
+
+
+# ---------------------------------------------------------
+# Preprocessing
+# ---------------------------------------------------------
+logger.info("Applying preprocessing (median imputation + scaling)")
 
 imputer = SimpleImputer(strategy="median")
-X_imputed = imputer.fit_transform(X)
-
 scaler = StandardScaler()
+
+X_imputed = imputer.fit_transform(X)
 X_scaled = scaler.fit_transform(X_imputed)
 
-# Legg tilbake kolonnenavnene
-X_scaled = pd.DataFrame(X_scaled, columns=features)
 
-print("Imputer and scaler created.")
+# ---------------------------------------------------------
+# Train/test split
+# ---------------------------------------------------------
+logger.info("Performing train/test split (80/20)")
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42
+)
 
 
-#%%
-print(df.columns.tolist())
-
-#%% md
-# ## 4. Tren tre modeller
-# 
-# Modellene som trenes:
-# - Linear Regression
-# - RandomForestRegressor
-# - XGBRegressor
-# 
-# Vi evaluerer med:
-# - MAE
-# - RMSE
-# - R²
-# 
-#%%
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
-from xgboost import XGBRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-
+# ---------------------------------------------------------
+# Model definitions
+# ---------------------------------------------------------
 models = {
     "LinearRegression": LinearRegression(),
     "RandomForestRegressor": RandomForestRegressor(
-        n_estimators=300,
-        random_state=42,
-        n_jobs=-1
+        n_estimators=300, random_state=42, n_jobs=-1
     ),
     "XGBRegressor": XGBRegressor(
         n_estimators=300,
@@ -113,21 +103,27 @@ models = {
         learning_rate=0.05,
         subsample=0.9,
         colsample_bytree=0.9,
-        random_state=42
-    )
+        random_state=42,
+    ),
 }
 
 results = []
 
+
+# ---------------------------------------------------------
+# Train and evaluate models
+# ---------------------------------------------------------
+logger.info("Training and evaluating models...")
+
 for name, model in models.items():
-    print(f"\nTraining {name}...")
-    model.fit(X_scaled, y)
-    y_pred = model.predict(X_scaled)
+    logger.info("Training %s", name)
+    model.fit(X_train, y_train)
 
-    mae = mean_absolute_error(y, y_pred)
-    rmse = mean_squared_error(y, y_pred) ** 0.5
-    r2 = r2_score(y, y_pred)
+    y_pred = model.predict(X_test)
 
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = mean_squared_error(y_test, y_pred) ** 0.5
+    r2 = r2_score(y_test, y_pred)
 
     results.append({
         "model": name,
@@ -137,102 +133,27 @@ for name, model in models.items():
     })
 
 results_df = pd.DataFrame(results).sort_values(by="RMSE")
-print("\nModel comparison:")
-display(results_df)
+logger.info("Model comparison:\n%s", results_df)
 
-#%% md
-# ## 5. Velg beste modell
-# 
-# Vi velger modellen med lavest RMSE.
-# 
-#%%
-best_row = results_df.iloc[0]
-best_model_name = best_row["model"]
-print(f"Selected best model: {best_model_name}")
 
-final_model = models[best_model_name]
+# ---------------------------------------------------------
+# Select best model
+# ---------------------------------------------------------
+best_model_name = results_df.iloc[0]["model"]
+best_model = models[best_model_name]
 
-#%% md
-# ## 6. Lagre modell og preprocessors
-# 
-# Disse filene brukes av Streamlit-appen:
-# - model.pkl
-# - scaler.pkl
-# - imputer.pkl
-# 
-#%%
-import joblib
+logger.info("Selected best model: %s", best_model_name)
 
-BASE_DIR = Path.cwd().parents[0]
-MODELS_DIR = BASE_DIR / "models"
-MODELS_DIR.mkdir(exist_ok=True)
 
-joblib.dump(final_model, MODELS_DIR / "model.pkl")
+# ---------------------------------------------------------
+# Save model and preprocessors
+# ---------------------------------------------------------
+logger.info("Saving model and preprocessors to %s", MODELS_DIR)
+
+joblib.dump(best_model, MODELS_DIR / "model.pkl")
 joblib.dump(scaler, MODELS_DIR / "scaler.pkl")
 joblib.dump(imputer, MODELS_DIR / "imputer.pkl")
 
-print("\nSaved files:")
+logger.info("Training complete. Files saved:")
 for f in MODELS_DIR.glob("*"):
-    print("-", f)
-
-#%% md
-# ## Notebook ferdig
-# 
-# Modellen er trent, evaluert og lagret.
-# Denne notebooken kan nå brukes direkte i rapporten.
-# 
-#%%
-print(results_df.to_string())
-
-#%%
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(8,6))
-sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
-plt.show()
-
-#%%
-df.hist(figsize=(10,8))
-plt.show()
-
-#%%
-plt.scatter(df["Glucose"], df["Insulin"])
-plt.xlabel("Glucose")
-plt.ylabel("Insulin")
-plt.show()
-
-#%%
-from xgboost import plot_importance
-plot_importance(final_model)
-plt.show()
-
-
-#%%
-import shap
-
-explainer = shap.TreeExplainer(final_model)
-shap_values = explainer.shap_values(X_scaled)
-
-shap.summary_plot(shap_values, X_scaled, feature_names=features)
-
-#%%
-shap.force_plot(explainer.expected_value, shap_values[0], X_test.iloc[0])
-
-#%%
-
-#%%
-import matplotlib.pyplot as plt
-
-models = ["Linear", "RandomForest", "XGBoost"]
-rmse = [0.010381, 0.002777, 0.000502]
-
-plt.bar(models, rmse)
-plt.ylabel("RMSE")
-plt.title("Model Comparison")
-plt.show()
-
-#%%
-sample_list = [45, 27, 110, 80, 55, 120]
-notebook_pred = final_model.predict([sample_list])
-notebook_pred
+    logger.info(" - %s", f)

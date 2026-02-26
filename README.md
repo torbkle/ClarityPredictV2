@@ -68,8 +68,9 @@ The system is designed for transparency, reproducibility, and clinical relevance
 
 ---
 
-##  Project Structure
+## Project Structure
 
+```
 ClarityPredictV2/
 │
 ├── app/
@@ -95,9 +96,10 @@ ClarityPredictV2/
 │   └── icons/           # Branding and UI icons
 │
 └── README.md
-
+```
 
 This structure ensures maintainability, clarity, and scalability.
+
 
 ---
 

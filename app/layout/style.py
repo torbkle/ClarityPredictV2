@@ -1,5 +1,5 @@
 # style.py
-# Injects global CSS and defines layout helpers for ClarityPredictV2.
+# Injects global CSS and defines layout helpers for ClarityPredict.
 
 import streamlit as st
 

@@ -1,6 +1,6 @@
 
 # branding.py
-# Centralized design tokens for ClarityPredictV2.
+# Centralized design tokens for ClarityPredict.
 # Defines colors, typography, spacing, and UI constants used across the app.
 
 
